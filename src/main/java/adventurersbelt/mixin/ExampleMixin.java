@@ -1,4 +1,4 @@
-package net.fabricmc.example.mixin;
+package adventurersbelt.mixin;
 
 import btw.BTWMod;
 import net.minecraft.src.GuiMainMenu;

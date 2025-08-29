@@ -1,4 +1,4 @@
-package net.fabricmc.example;
+package adventurersbelt;
 
 import net.fabricmc.api.ModInitializer;
 
