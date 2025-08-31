@@ -1,9 +1,8 @@
 package adventurersbelt.mixin;
 
-import adventurersbelt.AdventurersBeltAddon;
-import adventurersbelt.BeltSettings;
-import adventurersbelt.GuiBeltButton;
-import adventurersbelt.GuiBeltOptions;
+import adventurersbelt.settings.BeltSettings;
+import adventurersbelt.settings.GuiBeltButton;
+import adventurersbelt.settings.GuiBeltOptions;
 import net.minecraft.src.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

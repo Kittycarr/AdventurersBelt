@@ -1,4 +1,4 @@
-package adventurersbelt;
+package adventurersbelt.settings;
 
 import net.minecraft.src.FontRenderer;
 import net.minecraft.src.GuiButton;

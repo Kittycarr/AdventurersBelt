@@ -1,11 +1,10 @@
 package adventurersbelt.mixin;
 
 import adventurersbelt.AdventurersBeltAddon;
+import adventurersbelt.onscreen.GuiOnScreen;
 import btw.util.status.StatusEffect;
-import net.minecraft.src.FontRenderer;
-import net.minecraft.src.GuiIngame;
-import net.minecraft.src.Material;
-import net.minecraft.src.Minecraft;
+import net.minecraft.src.*;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,7 +19,14 @@ public class GuiInGameMixin {
     @Shadow
     private Minecraft mc;
 
+    @Shadow @Final private static RenderItem itemRenderer;
     private int amountRendered = 0;
+
+    @Inject(method = "renderGameOverlay", at = @At("HEAD"))
+    public void idfk(float par1, boolean par2, int par3, int par4, CallbackInfo ci){
+        GuiOnScreen.guiOnScreen.renderItem();
+    }
+
 
     @Inject(method = "Lnet/minecraft/src/GuiIngame;drawPenaltyText(II)V", at = @At("TAIL"))
     private void drawTimer(int iScreenX, int iScreenY, CallbackInfo cbi) {
@@ -43,4 +49,9 @@ public class GuiInGameMixin {
         fontRenderer.drawString(text, iScreenX - stringWidth + 100, iScreenY, 0);
         amountRendered++;
     }
+
+//    @Inject(method = "renderGameOverlay", at = @At("HEAD"))
+//    public void renderItemsOnScreen(float par1, boolean par2, int par3, int par4, CallbackInfo ci) {
+//        GuiOnScreen.guiOnScreen.renderItem();
+//    }
 }

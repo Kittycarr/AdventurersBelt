@@ -1,6 +1,5 @@
-package adventurersbelt;
+package adventurersbelt.settings;
 
-import net.minecraft.src.EnumOptions;
 import net.minecraft.src.GuiButton;
 import net.minecraft.src.Minecraft;
 import org.lwjgl.opengl.GL11;
