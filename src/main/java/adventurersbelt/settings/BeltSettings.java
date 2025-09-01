@@ -4,27 +4,18 @@ import adventurersbelt.AdventurersBeltAddon;
 import net.minecraft.src.I18n;
 import net.minecraft.src.KeyBinding;
 import net.minecraft.src.Minecraft;
-import org.lwjgl.Sys;
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 public class BeltSettings {
-
-    public static final BeltSettings beltSettings = new BeltSettings();
-
-    public static final File beltSettingsFile = new File("config/beltsettings.properties");
+    /**
+     * Properties of the mod.
+     */
+    protected static final HashMap<String, String> PROPERTIES = new HashMap<>();
     public Minecraft mc;
-
-    private static final ArrayList<String> propertyNames = new ArrayList<>();
-    private final Map<String, Float> floatProperties = new HashMap<>();
 
     public float clockPlacementX;
     public float clockPlacementY;
@@ -34,23 +25,14 @@ public class BeltSettings {
     public float calenderPlacementY;
     public KeyBinding accessPageKey;
 
-
     public BeltSettings() {
-        clockPlacementX = 0.5F;
-        clockPlacementY = 0.5F;
-        compassPlacementX = 0.5F;
-        compassPlacementY = 0.5F;
-        calenderPlacementX = 0.5F;
-        calenderPlacementY = 0.5F;
+        // Set objects
         accessPageKey = new KeyBinding("key.accesspage", 10);
         mc = Minecraft.getMinecraft();
-        declareProperties();
     }
 
-    public void declareProperties() {
-        propertyNames.add(0,"clockX");
-
-        floatProperties.put("clockX", clockPlacementX);
+    public static HashMap<String, String> getProperties() {
+        return PROPERTIES;
     }
 
     public String getKeyBindingDescription() {
@@ -93,126 +75,115 @@ public class BeltSettings {
         }
     }
 
-    public void saveOptions() {
-        Map <String, String> oldProperties = AdventurersBeltAddon.instance.loadConfigProperties();
-        Map <String, String> newProperties = new HashMap<>();
-        String propertyName;
+    /**
+     * Maps local properties to the {@code PROPERTIES} map
+     */
+    private void localToMappedProperties() {
+        PROPERTIES.put("clockX", String.valueOf(clockPlacementX));
+        PROPERTIES.put("clockY", String.valueOf(clockPlacementY));
+        PROPERTIES.put("compassX", String.valueOf(compassPlacementX));
+        PROPERTIES.put("compassY", String.valueOf(compassPlacementY));
+        PROPERTIES.put("calendarX", String.valueOf(calenderPlacementX));
+        PROPERTIES.put("calendarY", String.valueOf(calenderPlacementY));
+    }
 
-        if (oldProperties != null) {
-            for (int i = 0; i < propertyNames.size(); ) {
-                propertyName = propertyNames.get(i);
-                if (String.valueOf(floatProperties.get(propertyName)) != oldProperties.get(propertyName)) {
-                    newProperties.put(propertyName, String.valueOf(floatProperties.get(propertyName)));
+    /**
+     * Sets local properties based on the provided hash map
+     */
+    private void mappedToLocalProperties(@NotNull HashMap<String, String> map) {
+        clockPlacementX = Float.parseFloat(
+                map.getOrDefault("clockX", PROPERTIES.get("clockX")));
+        clockPlacementY = Float.parseFloat(
+                map.getOrDefault("clockY", PROPERTIES.get("clockY")));
+        compassPlacementX = Float.parseFloat(
+                map.getOrDefault("compassX", PROPERTIES.get("compassX")));
+        compassPlacementY = Float.parseFloat(
+                map.getOrDefault("compassY", PROPERTIES.get("compassY")));
+        calenderPlacementX = Float.parseFloat(
+                map.getOrDefault("calendarX", PROPERTIES.get("calendarX")));
+        calenderPlacementY = Float.parseFloat(
+                map.getOrDefault("calendarY", PROPERTIES.get("calendarY")));
+    }
+
+    /**
+     * Saves local values to config
+     */
+    public void saveOptions() {
+        // First, map our current values to the PROPERTIES map
+        localToMappedProperties();
+
+        Map <String, String> OLD = AdventurersBeltAddon.instance.loadConfigProperties();
+        Map <String, String> NEW = new HashMap<>();
+        if (OLD != null) {
+            // Previous properties exist, so begin updating
+            for (String propertyName : PROPERTIES.keySet()) {
+                // If the two values don't match...
+                if (!PROPERTIES.get(propertyName).equals(OLD.get(propertyName))) {
+                    // Put the new value in
+                    NEW.put(propertyName, PROPERTIES.get(propertyName));
                 } else {
-                    newProperties.put(propertyName, oldProperties.get(propertyName));
+                    // Otherwise, copy over the old property
+                    NEW.put(propertyName, OLD.get(propertyName));
+                }
+            }
+        }
+        else {
+            // No old config, so just copy on over
+            saveDefaultConfig();
+            return;
+        }
+
+        // Rebuild the config
+        AdventurersBeltAddon.instance.repopulateConfigFile(NEW);
+    }
+
+    /**
+     * Saves the default config, based on values in {@code PROPERTIES}
+     */
+    private HashMap<String, String> saveDefaultConfig() {
+        AdventurersBeltAddon.instance.repopulateConfigFile(PROPERTIES);
+        return PROPERTIES;
+    }
+
+    /**
+     * Loads and validates the config file
+     */
+    public void loadOptions() {
+        Map<String, String> LOAD = AdventurersBeltAddon.instance.loadConfigProperties();
+        HashMap<String, String> NEW = new HashMap<>();
+
+        // Check if properties have been saved before
+        if (LOAD != null) {
+            // Properties exist, so lets start setting values
+            for (String property : PROPERTIES.keySet()) {
+                // Get property from loaded
+                String value = LOAD.getOrDefault(property, "");
+                if (!value.isEmpty()) {
+                    // Not empty, put value in
+                    NEW.put(property, value);
+                } else {
+                    // Is empty, meaning the config does not contain
+                    // a value we need. So just put the default
+                    // value in
+                    NEW.put(property, PROPERTIES.get(property));
                 }
             }
         } else {
-            for (int i = 0; i < propertyNames.size(); ) {
-                propertyName = propertyNames.get(i);
-                newProperties.put(propertyName, String.valueOf(floatProperties.get(propertyName)));
-            }
+            // No config exists, so make one
+            NEW = saveDefaultConfig();
         }
 
-
-//        if (clockPlacementX != Float.parseFloat(oldProperties.get(propertyName))){
-//            String propertyValue = ("")
-//            newProperties.put(propertyName, propertyValue);
-//            AdventurersBeltAddon.instance.repopulateConfigFile();
-//        }
-
-
-//        properties.replace("clockX", ""+clockPlacementX);
-//        properties.setProperty("clockX", String.valueOf(this.clockPlacementX));
-
-//        try (FileOutputStream fileOutputStream = new FileOutputStream(beltSettingsFile)){
-//            properties.store(fileOutputStream, "Adventurers Belt Config");
-//        if (!beltSettingsFile.exists()) {
-//            try {
-//                Files.createFile(beltSettingsFile.toPath());
-//            } catch (IOException e) {
-//                throw new RuntimeException(e);
-//            }
-////        }
-//        if (beltSettingsFile.exists()){
-//            System.out.println("Belt- file exists");
-//        }
-//        try{
-//            BufferedWriter bufferedWriter = Files.newBufferedWriter(beltSettingsFile.toPath(), StandardOpenOption.TRUNCATE_EXISTING);
-//            bufferedWriter.write("clockX=" + this.clockPlacementX);
-//            bufferedWriter.newLine( );
-//
-////            PrintWriter var1 = new PrintWriter(new FileWriter(beltSettingsFile));
-////            var1.println("clockX" + this.clockPlacementX);
-//        } catch (IOException exception) {
-//            this.mc.getLogAgent().logWarning("Belt- Failed to save belt options");
-//            exception.printStackTrace();
-
+        // Set values
+        mappedToLocalProperties(NEW);
     }
 
-    public void loadOptions() {
-        Map<String, String> loadProperties = AdventurersBeltAddon.instance.loadConfigProperties();
-
-        if (loadProperties != null) {
-            if (loadProperties.equals(propertyNames.get(0))) {
-                clockPlacementX = Float.parseFloat(loadProperties.get(propertyNames.get(0)));
-            }
-        }
-//        System.out.println("Belt- loading Belt Options");
-//
-//        properties = propertyValues;
-//
-//        try {
-//            if (beltSettingsFile.exists()){
-//                System.out.println("Belt- file exists");
-//            }
-//            BufferedReader bufferedReader = Files.newBufferedReader(beltSettingsFile.toPath());
-//            String lineRead = "";
-//            while ((lineRead = bufferedReader.readLine()) != null) {
-//                String[] splitLine = lineRead.split("=");
-//                if (splitLine[0] == "clockX") {
-//                    clockPlacementX = Float.parseFloat(splitLine[1]);
-//                    System.out.println("Belt- loaded clock successfully");
-//                }
-//                System.out.println("Belt- finished loading");
-//            }
-//
-//        } catch (IOException exception) {
-//            this.mc.getLogAgent().logWarning("Belt- Failed to load belt options");
-//            exception.printStackTrace();
-//        }
-
-
-//        try (FileInputStream fileInputStream = new FileInputStream(beltSettingsFile)) {
-//            properties.load(fileInputStream);
-//        } catch (IOException e) {
-//            saveOptions();
-//            return;
-//        }
-
-
-//        try {
-//            if (!beltSettingsFile.exists()) {
-//                return;
-//            }
-//            BufferedReader var1 = new BufferedReader(new FileReader(beltSettingsFile));
-//            String var2 = "";
-//
-//            while ((var2 = var1.readLine()) != null) {
-//                try {
-//                    String[] var3 = var2.split(":");
-//                    if (var3[0].equals("clockX")){
-//                        this.clockPlacementX = Float.parseFloat(var3[1]);
-//                    }
-//                } catch (Exception var51) {
-//                    this.mc.getLogAgent().logWarning("Skipping bad option: " + var2);
-//                }
-//            }
-//        }
-//        catch (Exception var6){
-//            this.mc.getLogAgent().logWarning("Failed to load options");
-//            var6.printStackTrace();
-//        }
+    static {
+        PROPERTIES.put("clockX", "0.5F");
+        PROPERTIES.put("clockY", "0.5F");
+        PROPERTIES.put("compassX", "0.5F");
+        PROPERTIES.put("compassY", "0.5F");
+        PROPERTIES.put("calendarX", "0.5F");
+        PROPERTIES.put("calendarY", "0.5F");
     }
 
 }
