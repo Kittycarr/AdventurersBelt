@@ -10,24 +10,25 @@ import java.io.IOException;
 import java.util.Map;
 
 public class AdventurersBeltAddon extends BTWAddon {
-
-    public static AdventurersBeltAddon instance = new AdventurersBeltAddon();
+    public static AdventurersBeltAddon instance;
+    public static BeltSettings settings = new BeltSettings();
 
     public AdventurersBeltAddon() {
         super();
+        instance = this;
     }
 
     public static Boolean shouldShowDateTimer;
 
     public void preInitialize() {
         this.registerProperty("EnableMinecraftDateTimer", "True", "Set if the minecraft date should show up or not");
-        registerProperties();
+        registerPropertiesMap(BeltSettings.getProperties());
     }
 
     @Override
     public void handleConfigProperties(Map<String, String> propertyValues) {
         shouldShowDateTimer = Boolean.parseBoolean(propertyValues.get("EnableMinecraftDateTimer"));
-        BeltSettings.beltSettings.loadOptions();
+        settings.loadOptions();
     }
 
     @Override
@@ -35,7 +36,12 @@ public class AdventurersBeltAddon extends BTWAddon {
         AddonHandler.logMessage(this.getName() + " Version " + this.getVersionString() + " Initializing...");
     }
 
-    public void registerProperties(){
-        this.registerProperty("clockX", "0.5");
+    /**
+     * Registers properties in provided k/v set
+     */
+    public void registerPropertiesMap(Map<String, String> properties) {
+        for (String key : properties.keySet()) {
+            this.registerProperty(key, properties.get(key));
+        }
     }
 }

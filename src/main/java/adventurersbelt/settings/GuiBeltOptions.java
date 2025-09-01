@@ -1,5 +1,6 @@
 package adventurersbelt.settings;
 
+import adventurersbelt.AdventurersBeltAddon;
 import net.minecraft.src.*;
 
 public class GuiBeltOptions extends GuiScreen {
@@ -18,12 +19,12 @@ public class GuiBeltOptions extends GuiScreen {
     public void initGui() {
         this.buttonList.add(new GuiButton(6970, this.width / 2 - 75, this.height / 6 + 174 - 6, 150, 20, "Save"));
 
-        this.buttonList.add(new GuiBeltSlider(6971, this.width / 2 - 152, this.height / 6 + 96 - 6, "clock X", BeltSettings.beltSettings.clockPlacementX));
-        this.buttonList.add(new GuiBeltSlider(6972, this.width / 2 + 2, this.height / 6 + 96 - 6, "clock Y", BeltSettings.beltSettings.clockPlacementY));
-        this.buttonList.add(new GuiBeltSlider(6973, this.width / 2 - 152, this.height / 6 + 120 - 6, "compass X", BeltSettings.beltSettings.compassPlacementX));
-        this.buttonList.add(new GuiBeltSlider(6974, this.width / 2 + 2, this.height / 6 + 120 - 6, "compass Y", BeltSettings.beltSettings.compassPlacementY));
-        this.buttonList.add(new GuiBeltSlider(6975, this.width / 2 - 152, this.height / 6 + 144 - 6, "calender X", BeltSettings.beltSettings.calenderPlacementX));
-        this.buttonList.add(new GuiBeltSlider(6976, this.width / 2 + 2, this.height / 6 + 144 - 6, "calender Y", BeltSettings.beltSettings.calenderPlacementY));
+        this.buttonList.add(new GuiBeltSlider(6971, this.width / 2 - 152, this.height / 6 + 96 - 6, "clock X", AdventurersBeltAddon.settings.clockPlacementX));
+        this.buttonList.add(new GuiBeltSlider(6972, this.width / 2 + 2, this.height / 6 + 96 - 6, "clock Y", AdventurersBeltAddon.settings.clockPlacementY));
+        this.buttonList.add(new GuiBeltSlider(6973, this.width / 2 - 152, this.height / 6 + 120 - 6, "compass X", AdventurersBeltAddon.settings.compassPlacementX));
+        this.buttonList.add(new GuiBeltSlider(6974, this.width / 2 + 2, this.height / 6 + 120 - 6, "compass Y", AdventurersBeltAddon.settings.compassPlacementY));
+        this.buttonList.add(new GuiBeltSlider(6975, this.width / 2 - 152, this.height / 6 + 144 - 6, "calender X", AdventurersBeltAddon.settings.calenderPlacementX));
+        this.buttonList.add(new GuiBeltSlider(6976, this.width / 2 + 2, this.height / 6 + 144 - 6, "calender Y", AdventurersBeltAddon.settings.calenderPlacementY));
 
 //        this.buttonList.add(new GuiSlider(6971, this.width / 2 - 152, this.height / 6 + 96 - 6, var2, "", 0));
 //        this.buttonList.add(new GuiSlider(6972, this.width / 2 + 2, this.height / 6 + 96 - 6, var2, "", 0));
@@ -38,7 +39,7 @@ public class GuiBeltOptions extends GuiScreen {
         switch(guiButton.id) {
             case 6970:
                 mc.displayGuiScreen((this.parentScreen));
-                BeltSettings.beltSettings.saveOptions();
+                AdventurersBeltAddon.settings.saveOptions();
                 break;
             case 6971:
 

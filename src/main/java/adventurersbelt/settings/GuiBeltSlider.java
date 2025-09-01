@@ -1,5 +1,6 @@
 package adventurersbelt.settings;
 
+import adventurersbelt.AdventurersBeltAddon;
 import net.minecraft.src.GuiButton;
 import net.minecraft.src.Minecraft;
 import org.lwjgl.opengl.GL11;
@@ -30,7 +31,7 @@ public class GuiBeltSlider extends GuiButton {
                 if (this.sliderValue > 1.0F) {
                     this.sliderValue = 1.0F;
                 }
-                BeltSettings.beltSettings.setOptionFloatValue(this, this.sliderValue);
+                AdventurersBeltAddon.settings.setOptionFloatValue(this, this.sliderValue);
             }
 
             GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -50,7 +51,7 @@ public class GuiBeltSlider extends GuiButton {
                 this.sliderValue = 1.0F;
             }
 
-            BeltSettings.beltSettings.setOptionFloatValue(this, this.sliderValue);
+            AdventurersBeltAddon.settings.setOptionFloatValue(this, this.sliderValue);
             this.dragging = true;
             return true;
         } else {

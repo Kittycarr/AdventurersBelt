@@ -1,5 +1,6 @@
 package adventurersbelt.mixin;
 
+import adventurersbelt.AdventurersBeltAddon;
 import adventurersbelt.settings.BeltSettings;
 import adventurersbelt.settings.GuiBeltButton;
 import adventurersbelt.settings.GuiBeltOptions;
@@ -20,7 +21,7 @@ public class GuiInGameMenuMixin extends GuiScreen {
     @Inject(method = "actionPerformed", at = @At("HEAD"))
     public void MakeButtonDoShit(GuiButton guiButton, CallbackInfo ci){
         if (guiButton.id == 6969) {
-            this.mc.displayGuiScreen(new GuiBeltOptions(this, BeltSettings.beltSettings));
+            this.mc.displayGuiScreen(new GuiBeltOptions(this, AdventurersBeltAddon.settings));
         }
     }
 }
